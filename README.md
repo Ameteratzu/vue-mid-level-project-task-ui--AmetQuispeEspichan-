@@ -24,7 +24,7 @@ Verificaciom:
 - npx tailwindcss init -p
 - npm run dev o yarn dev
 
-enlace: http://localhost"""":
+enlace: http://localhost:5173
 
 
 # librerias

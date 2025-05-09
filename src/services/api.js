@@ -1,11 +1,12 @@
-import axios from 'axios';
+import axios from 'axios'
 
-
-// cliente axios
+// Pon el slash final para concatenar rutas sin doble barra
 export const api = axios.create({
-    baseURL: 'https://681507e7225ff1af162aeb7e.mockapi.io/api/v1/tasks',
-    timeout: 5000
-});
+  baseURL: 'https://681507e7225ff1af162aeb7e.mockapi.io/api/v1/',
+  timeout: 5000
+})
+
+
 
 
 
