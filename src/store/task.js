@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { api } from '@/services/api'
+import axios from 'axios'
 
 export const useTaskStore = defineStore('task', {
   state: () => ({
@@ -12,18 +12,11 @@ export const useTaskStore = defineStore('task', {
       this.loading = true
       this.error = null
       try {
-        let response
-        if (projectId) {
-          // Filtro explícito como string en la URL
-          response = await api.get(`tasks?projectId=${projectId}`)
-        } else {
-          // Sin filtro, trae todas
-          response = await api.get('tasks')
-        }
-        console.log('Tareas recibidas (store):', response.data)
+        const response = await axios.get(
+          `https://681507e7225ff1af162aeb7e.mockapi.io/api/v1/tasks?projectId=${projectId}`
+        )
         this.list = response.data
       } catch (err) {
-        console.error('Error cargando tareas:', err)
         this.error = err
       } finally {
         this.loading = false

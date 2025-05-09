@@ -1,68 +1,67 @@
 <template>
-  <div class="p-6">
-    <h1 class="text-2xl font-bold mb-4">
+  <div class="max-w-3xl mx-auto my-8 p-6 bg-white shadow-lg rounded-lg">
+    <h1 class="text-3xl font-bold mb-6 text-center">
       Tareas del Proyecto {{ projectId }}
     </h1>
 
-    <!-- Loader -->
-    <div v-if="loading" class="italic">Cargando tareas…</div>
-
-    <!-- Error -->
-    <div v-else-if="error" class="text-red-600">
-      Error: {{ error.message }}
+    <div v-if="taskStore.loading" class="italic text-center">Cargando…</div>
+    <div
+      v-else-if="taskStore.error"
+      class="text-red-600 text-center mb-4"
+    >
+      Error: {{ taskStore.error.message }}
     </div>
 
-    <!-- Depuración cruda -->
-    <pre
-      v-if="!loading && !error"
-      class="mb-4 bg-gray-100 p-2 overflow-auto"
+    <table
+      v-else
+      class="min-w-full border border-gray-300 divide-y divide-gray-200"
     >
-projectId: {{ projectId }}
-tasks raw: {{ tasks }}
-    </pre>
-
-    <!-- Renderiza lista -->
-    <ul v-if="!loading && !error">
-      <li v-for="t in tasks" :key="t.id">
-        {{ t.name }} — estado: {{ t.status }} — prioridad: {{ t.priority }}
-      </li>
-      <li v-if="tasks.length === 0" class="text-gray-500">
-        No hay tareas para este proyecto.
-      </li>
-    </ul>
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-4 py-2 border-b">Nombre</th>
+          <th class="px-4 py-2 border-b">Estado</th>
+          <th class="px-4 py-2 border-b">Prioridad</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <tr
+          v-for="t in taskStore.list"
+          :key="t.id"
+          class="hover:bg-gray-50"
+        >
+          <td class="px-4 py-2">{{ t.name }}</td>
+          <td class="px-4 py-2 capitalize">{{ t.status }}</td>
+          <td class="px-4 py-2 capitalize">{{ t.priority }}</td>
+        </tr>
+        <tr v-if="taskStore.list.length === 0">
+          <td colspan="3" class="px-4 py-4 text-center text-gray-500">
+            No hay tareas para este proyecto.
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
-import { api } from '@/services/api'
+import { onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useTaskStore } from '@/store/task'
 
-const props = defineProps({
-  projectId: { type: String, required: true }
-})
+const route     = useRoute()
+const router    = useRouter()
+const projectId = route.query.project_id
 
-const tasks = ref([])
-const loading = ref(false)
-const error   = ref(null)
+if (!projectId) router.replace('/projects')
 
-async function loadTasks(id) {
-  loading.value = true
-  error.value   = null
-  try {
-    // Llamada directa al endpoint, con filtro por projectId
-    const { data } = await api.get(`tasks`, {
-      params: { projectId: id }
-    })
-    console.log('Tareas retornadas:', data)
-    tasks.value = data
-  } catch (err) {
-    console.error('Error cargando tasks:', err)
-    error.value = err
-  } finally {
-    loading.value = false
+const taskStore = useTaskStore()
+
+onMounted(() => taskStore.fetchTasks(projectId))
+watch(
+  () => route.query.project_id,
+  id => {
+    if (id) taskStore.fetchTasks(id)
+    else router.replace('/projects')
   }
-}
-
-onMounted(() => loadTasks(props.projectId))
-watch(() => props.projectId, newId => loadTasks(newId))
+)
 </script>

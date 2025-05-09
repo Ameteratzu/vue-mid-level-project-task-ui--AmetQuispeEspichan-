@@ -12,12 +12,10 @@ export const useProjectStore = defineStore('project', {
       this.loading = true
       this.error = null
       try {
-        const { data } = await api.get('projects')
-        console.log('Proyectos recibidos:', data)  
+        const { data } = await api.get('/projects')
         this.list = data
       } catch (err) {
         this.error = err
-        console.error('Error al cargar proyectos:', err)
       } finally {
         this.loading = false
       }

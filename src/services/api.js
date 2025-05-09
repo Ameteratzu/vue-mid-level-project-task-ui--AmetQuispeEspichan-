@@ -1,24 +1,21 @@
 import axios from 'axios'
 
-// Pon el slash final para concatenar rutas sin doble barra
+const BASE_URL = 'https://681507e7225ff1af162aeb7e.mockapi.io/api/v1'
+
 export const api = axios.create({
-  baseURL: 'https://681507e7225ff1af162aeb7e.mockapi.io/api/v1/',
+  baseURL: BASE_URL,
   timeout: 5000
 })
 
 
 
-
-
-// Interceptor para manejar errores
-api.interceptors.request.use(config => {
-    return config;
-}, error => Promise.reject(error));
-
-// Interceptores de respuesta
-api.interceptors.response.use(response => {
-    return response;
-}, error => {
-    return Promise.reject(error);
+/**
+ * Trae las tareas que tienen projectId.
+ * @param {string|number} projectId
+ */
+export async function fetchTasks(projectId) {
+  const { data } = await axios.get(`${BASE_URL}/tasks`, {
+    params: { projectId }
+  })
+  return data
 }
-);

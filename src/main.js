@@ -4,7 +4,7 @@ import router from './router'
 import App from './App.vue'
 import './index.css'
 
-const app = createApp(App)
-app.use(createPinia())   // monta Pinia
-app.use(router)
-app.mount('#app')
+createApp(App)
+  .use(createPinia())
+  .use(router)
+  .mount('#app')
