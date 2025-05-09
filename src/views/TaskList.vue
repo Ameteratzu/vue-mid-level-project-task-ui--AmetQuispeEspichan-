@@ -4,41 +4,65 @@
       Tareas del Proyecto {{ projectId }}
     </h1>
 
-    <Loader v-if="taskStore.loading" />
-    <Alert
-      v-else-if="taskStore.error"
-      :message="taskStore.error.message"
-    />
+    <!-- Loader -->
+    <div v-if="loading" class="italic">Cargando tareas…</div>
+
+    <!-- Error -->
+    <div v-else-if="error" class="text-red-600">
+      Error: {{ error.message }}
+    </div>
+
+    <!-- Depuración cruda -->
     <pre
-      v-if="!taskStore.loading && !taskStore.error"
+      v-if="!loading && !error"
       class="mb-4 bg-gray-100 p-2 overflow-auto"
     >
 projectId: {{ projectId }}
-tasks raw: {{ taskStore.list }}
+tasks raw: {{ tasks }}
     </pre>
-    <Table
-      v-if="!taskStore.loading && !taskStore.error"
-      :data="taskStore.list"
-    />
+
+    <!-- Renderiza lista -->
+    <ul v-if="!loading && !error">
+      <li v-for="t in tasks" :key="t.id">
+        {{ t.name }} — estado: {{ t.status }} — prioridad: {{ t.priority }}
+      </li>
+      <li v-if="tasks.length === 0" class="text-gray-500">
+        No hay tareas para este proyecto.
+      </li>
+    </ul>
   </div>
 </template>
 
 <script setup>
-import { onMounted, watch } from 'vue'
-import { useTaskStore } from '@/store/task'
-import Loader from '@/components/Loader.vue'
-import Alert  from '@/components/Alert.vue'
-import Table  from '@/components/Table.vue'
+import { ref, onMounted, watch } from 'vue'
+import { api } from '@/services/api'
 
 const props = defineProps({
   projectId: { type: String, required: true }
 })
-const taskStore = useTaskStore()
 
-const loadTasks = async () => {
-  await taskStore.fetchTasks(props.projectId)
+const tasks = ref([])
+const loading = ref(false)
+const error   = ref(null)
+
+async function loadTasks(id) {
+  loading.value = true
+  error.value   = null
+  try {
+    // Llamada directa al endpoint, con filtro por projectId
+    const { data } = await api.get(`tasks`, {
+      params: { projectId: id }
+    })
+    console.log('Tareas retornadas:', data)
+    tasks.value = data
+  } catch (err) {
+    console.error('Error cargando tasks:', err)
+    error.value = err
+  } finally {
+    loading.value = false
+  }
 }
 
-onMounted(loadTasks)
-watch(() => props.projectId, loadTasks)
+onMounted(() => loadTasks(props.projectId))
+watch(() => props.projectId, newId => loadTasks(newId))
 </script>
