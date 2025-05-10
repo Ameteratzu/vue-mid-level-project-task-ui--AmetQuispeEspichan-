@@ -1,37 +1,36 @@
 <template>
-  <div class="max-w-3xl mx-auto my-8 p-6 bg-white shadow-lg rounded-lg">
+  <div class="max-w-3xl mx-auto my-8">
+    <router-link to="/projects" class="btn-back">Volver</router-link>
+
     <h1 class="text-3xl font-bold mb-6 text-center">
-      Tareas del Proyecto {{ projectId }}
+      Lista de tareas del proyecto {{ projectId }}
     </h1>
 
     <div v-if="taskStore.loading" class="italic text-center">Cargando…</div>
-    <div
-      v-else-if="taskStore.error"
-      class="text-red-600 text-center mb-4"
-    >
+    <div v-else-if="taskStore.error" class="text-red-600 text-center mb-4">
       Error: {{ taskStore.error.message }}
     </div>
 
-     <table v-else class="custom-table">
-      <thead class="bg-gray-100">
+    <table v-else class="custom-table">
+      <thead>
         <tr>
-          <th class="px-4 py-2 border-b">Nombre</th>
-          <th class="px-4 py-2 border-b">Estado</th>
-          <th class="px-4 py-2 border-b">Prioridad</th>
+          <th>Título</th>
+          <th>Descripción</th>
+          <th>Prioridad</th>
+          <th>Estado</th>
+          <th>Fecha de entrega</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-200">
-        <tr
-          v-for="t in taskStore.list"
-          :key="t.id"
-          class="hover:bg-gray-50"
-        >
-          <td class="px-4 py-2">{{ t.name }}</td>
-          <td class="px-4 py-2 capitalize">{{ t.status }}</td>
-          <td class="px-4 py-2 capitalize">{{ t.priority }}</td>
+      <tbody>
+        <tr v-for="t in taskStore.list" :key="t.id">
+          <td>{{ t.name }}</td>
+          <td>{{ t.description }}</td>
+          <td class="capitalize">{{ t.priority }}</td>
+          <td class="capitalize">{{ t.status }}</td>
+          <td>{{ t.dueDate }}</td>
         </tr>
-        <tr v-if="taskStore.list.length === 0">
-          <td colspan="3" class="px-4 py-4 text-center text-gray-500">
+        <tr v-if="!taskStore.list.length">
+          <td colspan="5" class="py-4 text-center text-gray-500">
             No hay tareas para este proyecto.
           </td>
         </tr>
