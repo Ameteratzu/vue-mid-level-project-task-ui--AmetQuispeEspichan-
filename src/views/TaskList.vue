@@ -12,10 +12,7 @@
       Error: {{ taskStore.error.message }}
     </div>
 
-    <table
-      v-else
-      class="min-w-full border border-gray-300 divide-y divide-gray-200"
-    >
+     <table v-else class="custom-table">
       <thead class="bg-gray-100">
         <tr>
           <th class="px-4 py-2 border-b">Nombre</th>
